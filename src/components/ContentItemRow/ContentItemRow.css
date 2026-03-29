@@ -1,0 +1,46 @@
+.content-item-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.content-item-row input {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.content-item-row input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-remove {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #ef4444;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove:hover {
+  background: #ef4444;
+  color: #fff;
+}

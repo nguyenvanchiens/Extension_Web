@@ -1,0 +1,196 @@
+.field-editor {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.field-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.field-editor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-paste-csharp {
+  padding: 6px 14px;
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  background: #fffbeb;
+  color: #b45309;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-paste-csharp:hover {
+  background: #fef3c7;
+}
+
+.btn-paste-csharp.active {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.csharp-paste-area {
+  margin-bottom: 14px;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fffbeb;
+}
+
+.csharp-paste-area textarea {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.csharp-paste-area textarea:focus {
+  outline: none;
+}
+
+.csharp-paste-area textarea::placeholder {
+  color: #64748b;
+}
+
+.csharp-paste-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.btn-parse {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-parse:hover {
+  background: #d97706;
+}
+
+.parse-hint {
+  font-size: 12px;
+  color: #92400e;
+}
+
+.btn-add-field {
+  padding: 6px 14px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 6px;
+  background: transparent;
+  color: #4f46e5;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-field:hover {
+  border-color: #4f46e5;
+  background: #eef2ff;
+}
+
+.field-table-wrapper {
+  overflow-x: auto;
+}
+
+.field-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.field-table th {
+  padding: 8px 6px;
+  text-align: left;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.field-table td {
+  padding: 4px 4px;
+}
+
+.field-table input[type='text'],
+.field-table input[type='number'],
+.field-table select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.field-table input:focus,
+.field-table select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.input-small {
+  width: 70px !important;
+}
+
+.td-center {
+  text-align: center;
+}
+
+.field-table input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #4f46e5;
+}
+
+.btn-remove-field {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: #fee2e2;
+  color: #ef4444;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove-field:hover {
+  background: #ef4444;
+  color: #fff;
+}

@@ -1,0 +1,59 @@
+.code-preview {
+  background: #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+}
+
+.code-filename {
+  font-size: 13px;
+  color: #94a3b8;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.btn-copy-code {
+  padding: 4px 12px;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-copy-code:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.btn-copy-code.copied {
+  background: #10b981;
+  border-color: #10b981;
+  color: #fff;
+}
+
+.code-content {
+  padding: 16px;
+  margin: 0;
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.code-content code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  white-space: pre;
+}
