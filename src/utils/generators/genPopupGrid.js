@@ -17,7 +17,7 @@ export function genPopupGrid(moduleName, config) {
     hideOnOutsideClick = false,
   } = config;
 
-  const camel = moduleName.charAt(0).toLowerCase() + moduleName.slice(1);
+
   const lines = [];
 
   lines.push(`namespace My {`);

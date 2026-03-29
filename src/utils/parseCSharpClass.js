@@ -39,7 +39,6 @@ export function parseCSharpClass(code) {
     if (propMatch) {
       const csharpType = propMatch[1].trim();
       const name = propMatch[2];
-      const tsType = mapCSharpTypeToTs(csharpType);
       const dataType = inferDataType(csharpType);
       const editorType = inferEditorType(csharpType, dataType);
       const required = pendingAttributes.includes('Required');
@@ -67,30 +66,6 @@ export function parseCSharpClass(code) {
   }
 
   return result;
-}
-
-function mapCSharpTypeToTs(csharpType) {
-  const t = csharpType.replace('?', '').trim();
-  const map = {
-    string: 'string',
-    int: 'number',
-    long: 'number',
-    float: 'number',
-    double: 'number',
-    decimal: 'number',
-    bool: 'boolean',
-    boolean: 'boolean',
-    DateTime: 'Date',
-    'byte[]': 'string',
-    Guid: 'string',
-  };
-  if (map[t]) return map[t];
-  if (t.startsWith('List<') || t.startsWith('IList<') || t.startsWith('IEnumerable<')) {
-    const inner = t.match(/<(.+)>/);
-    if (inner) return `${mapCSharpTypeToTs(inner[1])}[]`;
-    return 'any[]';
-  }
-  return 'any';
 }
 
 function inferDataType(csharpType) {
