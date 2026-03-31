@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar/Sidebar';
 import NotificationPage from './pages/NotificationPage';
 import GenCodeV3Page from './pages/GenCodeV3/GenCodeV3Page';
 import HelperPage from './pages/Helper/HelperPage';
+import SendMailPage from './pages/SendMail/SendMailPage';
 import './App.css';
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
         return <GenCodeV3Page />;
       case 'helper':
         return <HelperPage />;
+      case 'send-mail':
+        return <SendMailPage />;
       default:
         return <NotificationPage />;
     }

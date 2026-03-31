@@ -5,6 +5,7 @@ const menuItems = [
   { id: 'notification', label: 'Build Notification', icon: '📢' },
   { id: 'gen-code-v3', label: 'Gen Code V3', icon: '⚡' },
   { id: 'helper', label: 'Helper', icon: '📖' },
+  { id: 'send-mail', label: 'Send Mail', icon: '📧' },
 ];
 
 function Sidebar({ activeTool, onToolChange, collapsed, onToggle }) {

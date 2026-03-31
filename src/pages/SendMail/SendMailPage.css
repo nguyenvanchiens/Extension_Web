@@ -1,0 +1,255 @@
+.mail-container {
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.mail-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.mail-field {
+  margin-bottom: 18px;
+}
+
+.mail-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.mail-hint {
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.mail-field input,
+.mail-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e293b;
+  background: #f8fafc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  box-sizing: border-box;
+}
+
+.mail-field input:focus,
+.mail-field textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #fff;
+}
+
+.mail-field textarea {
+  resize: vertical;
+  min-height: 350px;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+.mail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.mail-btn-send {
+  padding: 10px 28px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mail-btn-send:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.mail-btn-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mail-btn-reset {
+  padding: 10px 20px;
+  background: #fff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mail-btn-reset:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Sender section */
+.mail-sender-section,
+.mail-compose-section {
+  margin-bottom: 8px;
+}
+
+.mail-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mail-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mail-password-wrap {
+  position: relative;
+  display: flex;
+}
+
+.mail-password-wrap input {
+  flex: 1;
+  padding-right: 60px;
+}
+
+.mail-password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.mail-password-toggle:hover {
+  color: #2563eb;
+}
+
+/* Alert */
+.mail-alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mail-alert-success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.mail-alert-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.mail-alert-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  padding: 0 4px;
+}
+
+.mail-alert-close:hover {
+  opacity: 1;
+}
+
+/* Preview */
+.mail-preview-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.mail-preview-header {
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mail-preview-header h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px;
+}
+
+.mail-preview-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.mail-preview-meta strong {
+  color: #374151;
+}
+
+.mail-preview-body {
+  padding: 24px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #334155;
+}
+
+.mail-preview-body .mail-placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Preview body HTML reset */
+.mail-preview-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+.mail-preview-body table {
+  max-width: 100%;
+}
+
+@media (max-width: 900px) {
+  .mail-container {
+    grid-template-columns: 1fr;
+  }
+}
