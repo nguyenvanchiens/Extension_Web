@@ -126,8 +126,8 @@ export function genGrid(moduleName, config) {
     if (f.type === 'lookup' && f.lookupDataSource) {
       col += `\n                        .lookup(x => x.dataSource(${f.lookupDataSource}))`;
     }
-    if (f.required) col += `.validationRules(v => v.addRequired())`;
-    if (f.visible === false) col += `.visible(false)`;
+    if (f.required) col += `.required()`;
+    if (f.hidden) col += `.visible(false)`;
     col += ';';
     lines.push(col);
   });

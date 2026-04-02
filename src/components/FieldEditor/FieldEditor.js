@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { parseCSharpClass } from '../../utils/parseCSharpClass';
 import './FieldEditor.css';
 
-const DATA_TYPES = ['string', 'number', 'boolean', 'date', 'datetime', 'lookup'];
+const DATA_TYPES = ['string', 'number', 'boolean', 'date', 'datetime', 'lookup', 'ValueTextModel[]'];
 const EDITOR_TYPES = ['', 'dxTextBox', 'dxNumberBox', 'dxSelectBox', 'dxDateBox', 'dxTextArea', 'dxCheckBox'];
 const ALIGNMENTS = ['', 'left', 'center', 'right'];
 
@@ -87,6 +87,7 @@ function FieldEditor({ fields, onChange, showEditor = false, showGrid = true, on
               {showGrid && <th>Width</th>}
               {showGrid && <th>Align</th>}
               {showGrid && <th>Lookup</th>}
+              {showGrid && <th>Ẩn</th>}
               {showEditor && <th>Editor</th>}
               <th>Required</th>
               <th></th>
@@ -156,6 +157,15 @@ function FieldEditor({ fields, onChange, showEditor = false, showGrid = true, on
                     ) : (
                       <span style={{ color: '#cbd5e1', fontSize: 12 }}>—</span>
                     )}
+                  </td>
+                )}
+                {showGrid && (
+                  <td className="td-center">
+                    <input
+                      type="checkbox"
+                      checked={f.hidden || false}
+                      onChange={(e) => handleFieldChange(i, 'hidden', e.target.checked)}
+                    />
                   </td>
                 )}
                 {showEditor && (

@@ -78,7 +78,7 @@ export function genPopupForm(moduleName, config) {
 
   fields.forEach((f) => {
     let line = `                        groupItems.addSimpleFor('${f.name}')`;
-    if (f.required) line += `.isRequired(true)`;
+    if (f.required) line += `.required()`;
     line += `.label(Utils.l(LanguageKey.${moduleName}.Popup.${f.name}))`;
 
     if (f.editorType === 'dxTextArea') {

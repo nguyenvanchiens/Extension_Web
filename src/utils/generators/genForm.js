@@ -31,7 +31,7 @@ export function genForm(moduleName, config) {
 
   fields.forEach((f) => {
     let item = `                    items.addSimpleFor('${f.name}', LanguageKey.${moduleName}.Form.${f.name})`;
-    if (f.required) item += `.isRequired(true)`;
+    if (f.required) item += `.required()`;
     if (f.editorType === 'dxTextArea') {
       item += `\n                        .editor(e => e.createTextArea('${f.name}').height(80))`;
     } else if (f.editorType === 'dxDateBox') {
