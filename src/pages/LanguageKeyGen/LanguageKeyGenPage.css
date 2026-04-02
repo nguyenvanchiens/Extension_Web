@@ -1,0 +1,288 @@
+.lkg-container {
+  max-width: 900px;
+}
+
+.lkg-mode-switch {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.lkg-mode-btn {
+  padding: 10px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lkg-mode-btn:hover {
+  border-color: #4f46e5;
+  color: #4f46e5;
+}
+
+.lkg-mode-btn.active {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+
+.lkg-instructions {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border-left: 4px solid #4f46e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.lkg-instructions p {
+  font-size: 14px;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.lkg-format {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.lkg-format code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  color: #4f46e5;
+}
+
+.lkg-hint {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.lkg-hint code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #4f46e5;
+  font-family: 'Consolas', monospace;
+}
+
+.lkg-textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  color: #1e293b;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.lkg-textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.lkg-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.lkg-btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lkg-btn-primary {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.lkg-btn-primary:hover {
+  background: #4338ca;
+}
+
+.lkg-btn-copy {
+  background: #10b981;
+  color: #fff;
+}
+
+.lkg-btn-copy:hover {
+  background: #059669;
+}
+
+.lkg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lkg-count {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Table */
+.lkg-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.lkg-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 14px;
+}
+
+.lkg-table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 700;
+  color: #fff;
+  background: #4f46e5;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lkg-th-index {
+  width: 40px;
+  text-align: center !important;
+}
+
+.lkg-td-index {
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.lkg-table tbody td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.lkg-table tbody td code {
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #4f46e5;
+  font-family: 'Consolas', monospace;
+}
+
+.lkg-edit-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #334155;
+  background: transparent;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.lkg-edit-input:hover {
+  border-color: #e2e8f0;
+  background: #f8fafc;
+}
+
+.lkg-edit-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.lkg-th-copy {
+  width: 44px;
+}
+
+.lkg-td-copy {
+  text-align: center;
+}
+
+.lkg-btn-row-copy {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lkg-btn-row-copy:hover {
+  background: #eef2ff;
+}
+
+.lkg-row {
+  transition: background 0.15s;
+}
+
+.lkg-row:hover {
+  background: #f8fafc;
+}
+
+.lkg-copied {
+  background: #dcfce7 !important;
+}
+
+/* Toast */
+.lkg-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #10b981;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: lkg-fadeIn 0.3s ease;
+  z-index: 1000;
+}
+
+@keyframes lkg-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -4,6 +4,7 @@ import './Sidebar.css';
 const menuItems = [
   { id: 'notification', label: 'Build Notification', icon: '📢' },
   { id: 'gen-code-v3', label: 'Gen Code V3', icon: '⚡' },
+  { id: 'lang-key-gen', label: 'Language Key Gen', icon: '🌐' },
   { id: 'helper', label: 'Helper', icon: '📖' },
   { id: 'send-mail', label: 'Send Mail', icon: '📧' },
 ];
