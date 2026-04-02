@@ -13,6 +13,7 @@ const menuGroups = [
     label: 'Utilities',
     items: [
       { id: 'notification', label: 'Build Notification', icon: '📢' },
+      { id: 'db-explorer', label: 'DB Explorer', icon: '🗄' },
       { id: 'json-formatter', label: 'JSON Formatter', icon: '{ }' },
       { id: 'send-mail', label: 'Send Mail', icon: '📧' },
     ],

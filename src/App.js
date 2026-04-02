@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar/Sidebar';
 import NotificationPage from './pages/NotificationPage';
 import GenCodeV3Page from './pages/GenCodeV3/GenCodeV3Page';
 import LanguageKeyGenPage from './pages/LanguageKeyGen/LanguageKeyGenPage';
+import DbExplorerPage from './pages/DbExplorer/DbExplorerPage';
 import JsonFormatterPage from './pages/JsonFormatter/JsonFormatterPage';
 import HelperPage from './pages/Helper/HelperPage';
 import SendMailPage from './pages/SendMail/SendMailPage';
@@ -20,6 +21,8 @@ function App() {
         return <GenCodeV3Page />;
       case 'lang-key-gen':
         return <LanguageKeyGenPage />;
+      case 'db-explorer':
+        return <DbExplorerPage />;
       case 'json-formatter':
         return <JsonFormatterPage />;
       case 'helper':
