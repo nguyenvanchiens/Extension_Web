@@ -1,12 +1,28 @@
 import React from 'react';
 import './Sidebar.css';
 
-const menuItems = [
-  { id: 'notification', label: 'Build Notification', icon: '📢' },
-  { id: 'gen-code-v3', label: 'Gen Code V3', icon: '⚡' },
-  { id: 'lang-key-gen', label: 'Language Key Gen', icon: '🌐' },
-  { id: 'helper', label: 'Helper', icon: '📖' },
-  { id: 'send-mail', label: 'Send Mail', icon: '📧' },
+const menuGroups = [
+  {
+    label: 'Code Generator',
+    items: [
+      { id: 'gen-code-v3', label: 'Gen Code V3', icon: '⚡' },
+      { id: 'lang-key-gen', label: 'Language Key Gen', icon: '🌐' },
+    ],
+  },
+  {
+    label: 'Utilities',
+    items: [
+      { id: 'notification', label: 'Build Notification', icon: '📢' },
+      { id: 'json-formatter', label: 'JSON Formatter', icon: '{ }' },
+      { id: 'send-mail', label: 'Send Mail', icon: '📧' },
+    ],
+  },
+  {
+    label: 'Docs',
+    items: [
+      { id: 'helper', label: 'Helper', icon: '📖' },
+    ],
+  },
 ];
 
 function Sidebar({ activeTool, onToolChange, collapsed, onToggle }) {
@@ -23,16 +39,22 @@ function Sidebar({ activeTool, onToolChange, collapsed, onToggle }) {
       </div>
 
       <nav className="sidebar-nav">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            className={`sidebar-item ${activeTool === item.id ? 'active' : ''}`}
-            onClick={() => onToolChange(item.id)}
-            title={item.label}
-          >
-            <span className="sidebar-icon">{item.icon}</span>
-            {!collapsed && <span className="sidebar-label">{item.label}</span>}
-          </button>
+        {menuGroups.map((group) => (
+          <div key={group.label} className="sidebar-group">
+            {!collapsed && <div className="sidebar-group-label">{group.label}</div>}
+            {collapsed && <div className="sidebar-group-divider"></div>}
+            {group.items.map((item) => (
+              <button
+                key={item.id}
+                className={`sidebar-item ${activeTool === item.id ? 'active' : ''}`}
+                onClick={() => onToolChange(item.id)}
+                title={item.label}
+              >
+                <span className="sidebar-icon">{item.icon}</span>
+                {!collapsed && <span className="sidebar-label">{item.label}</span>}
+              </button>
+            ))}
+          </div>
         ))}
       </nav>
 

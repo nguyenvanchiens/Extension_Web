@@ -1,0 +1,183 @@
+.jf-container {
+  max-width: 100%;
+}
+
+.jf-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jf-toolbar-left {
+  display: flex;
+  gap: 8px;
+}
+
+.jf-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.jf-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.jf-btn-primary {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.jf-btn-primary:hover {
+  background: #4338ca;
+}
+
+.jf-btn-secondary {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.jf-btn-secondary:hover {
+  background: #d97706;
+}
+
+.jf-btn-outline {
+  background: #fff;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.jf-btn-outline:hover:not(:disabled) {
+  border-color: #4f46e5;
+  color: #4f46e5;
+}
+
+.jf-btn-danger {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.jf-btn-danger:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.jf-indent-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jf-indent-select {
+  padding: 6px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.jf-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.jf-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .jf-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jf-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.jf-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.jf-panel-btn {
+  padding: 4px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.jf-panel-btn:hover:not(:disabled) {
+  border-color: #4f46e5;
+  color: #4f46e5;
+}
+
+.jf-panel-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.jf-info {
+  font-weight: 500;
+  color: #64748b;
+  font-size: 12px;
+  margin-left: 8px;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.jf-textarea {
+  width: 100%;
+  min-height: 450px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  color: #1e293b;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.jf-textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.jf-output {
+  background: #f8fafc;
+  color: #334155;
+}
