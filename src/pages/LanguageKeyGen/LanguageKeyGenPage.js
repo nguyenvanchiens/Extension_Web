@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { translateToVietnamese, toEnglishReadable } from '../../utils/viDictionary';
+import { toEnglishReadable } from '../../utils/viDictionary';
+import { translateBatch } from '../../utils/translateApi';
 import './LanguageKeyGenPage.css';
 
 const MODES = [
@@ -13,6 +14,7 @@ function LanguageKeyGenPage() {
   const [results, setResults] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [toast, setToast] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const showToast = (message) => {
     setToast(message);
@@ -53,38 +55,54 @@ function LanguageKeyGenPage() {
     setResults(parsed);
   };
 
-  const parseKeyMode = () => {
+  const parseKeyMode = async () => {
     const lines = input.split('\n');
-    const parsed = [];
+    const items = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
 
-      // Lấy key: có thể là "Office.SupplierInteraction.Button.History"
-      // hoặc "History: 'Office.SupplierInteraction.Button.History',"
       let key = line;
       const keyMatch = line.match(/['"]([^'"]+)['"]/);
       if (keyMatch) {
         key = keyMatch[1];
       } else {
-        // Bỏ dấu , cuối nếu có
         key = line.replace(/,\s*$/, '').trim();
       }
 
       if (!key) continue;
 
-      // Lấy phần cuối cùng sau dấu chấm
       const parts = key.split('.');
       const lastPart = parts[parts.length - 1];
-
       const english = toEnglishReadable(lastPart);
-      const vietnamese = translateToVietnamese(lastPart);
 
-      parsed.push({ key, vietnamese, english });
+      items.push({ key, english });
     }
 
-    setResults(parsed);
+    if (items.length === 0) return;
+
+    // Gọi API dịch batch
+    setLoading(true);
+    try {
+      const englishTexts = items.map((item) => item.english);
+      const vietnameseTexts = await translateBatch(englishTexts, 'en', 'vi');
+
+      const parsed = items.map((item, i) => ({
+        key: item.key,
+        english: item.english,
+        vietnamese: vietnameseTexts[i] || item.english,
+      }));
+
+      setResults(parsed);
+    } catch {
+      // Fallback: giữ nguyên english
+      setResults(items.map((item) => ({
+        ...item,
+        vietnamese: item.english,
+      })));
+    }
+    setLoading(false);
   };
 
   const handleParse = () => {
@@ -150,13 +168,13 @@ function LanguageKeyGenPage() {
 
         {mode === 'key' && (
           <div className="lkg-instructions">
-            <p><strong>Hướng dẫn:</strong> Paste danh sách key, mỗi dòng 1 key. Tool sẽ tự dịch phần cuối.</p>
+            <p><strong>Hướng dẫn:</strong> Paste danh sách key, mỗi dòng 1 key. Tool sẽ tự dịch qua <strong>Google Translate</strong>.</p>
             <div className="lkg-format">
               <code>{'Office.SupplierInteraction.Button.History'}</code>
               <code>{'SupermarketCheckin.Table.CreatedTime'}</code>
               <code>{'SupermarketProduct.Form.UnitPrice'}</code>
             </div>
-            <p className="lkg-hint">Lấy phần cuối (VD: <code>History</code>), tách PascalCase, tự dịch sang Tiếng Việt</p>
+            <p className="lkg-hint">Lấy phần cuối (VD: <code>History</code>), tách PascalCase, gọi API dịch sang Tiếng Việt. Có thể sửa trực tiếp nếu dịch sai.</p>
           </div>
         )}
 
@@ -172,8 +190,8 @@ function LanguageKeyGenPage() {
         />
 
         <div className="lkg-actions">
-          <button className="lkg-btn lkg-btn-primary" onClick={handleParse}>
-            Chuyển đổi
+          <button className="lkg-btn lkg-btn-primary" onClick={handleParse} disabled={loading}>
+            {loading ? 'Đang dịch...' : 'Chuyển đổi'}
           </button>
           <button className="lkg-btn lkg-btn-copy" onClick={copyAll} disabled={results.length === 0}>
             Copy tất cả
@@ -181,6 +199,7 @@ function LanguageKeyGenPage() {
           {results.length > 0 && (
             <span className="lkg-count">{results.length} kết quả</span>
           )}
+          {loading && <span className="lkg-loading">Đang gọi Google Translate...</span>}
         </div>
 
         {results.length > 0 && (

@@ -146,6 +146,18 @@
   font-weight: 600;
 }
 
+.lkg-loading {
+  font-size: 13px;
+  color: #4f46e5;
+  font-weight: 600;
+  animation: lkg-pulse 1.5s ease infinite;
+}
+
+@keyframes lkg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 /* Table */
 .lkg-table-wrapper {
   overflow-x: auto;
