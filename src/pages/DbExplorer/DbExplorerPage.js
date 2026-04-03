@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import './DbExplorerPage.css';
 
-const API_URL = process.env.REACT_APP_DB_API_URL || 'https://connect-database.runasp.net/api/db';
+const API_OPTIONS = [
+  { label: 'Node.js (localhost:3001)', url: 'http://localhost:3001/api/db' },
+];
 
 function DbExplorerPage() {
+  const [apiUrl, setApiUrl] = useState(() => localStorage.getItem('dbe_api_url') || API_OPTIONS[0].url);
+  const [customApi, setCustomApi] = useState('');
   const [connectionString, setConnectionString] = useState('');
   const [connected, setConnected] = useState(false);
   const [databases, setDatabases] = useState([]);
@@ -17,13 +21,26 @@ function DbExplorerPage() {
   const [searchDb, setSearchDb] = useState('');
   const [searchTable, setSearchTable] = useState('');
 
+  const handleApiChange = (value) => {
+    if (value === 'custom') return;
+    setApiUrl(value);
+    localStorage.setItem('dbe_api_url', value);
+  };
+
+  const handleCustomApiApply = () => {
+    if (!customApi.trim()) return;
+    const url = customApi.trim().replace(/\/+$/, '');
+    setApiUrl(url);
+    localStorage.setItem('dbe_api_url', url);
+  };
+
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(''), 2000);
   };
 
   const apiCall = async (endpoint, body) => {
-    const res = await fetch(`${API_URL}/${endpoint}`, {
+    const res = await fetch(`${apiUrl}/${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -167,12 +184,52 @@ function DbExplorerPage() {
       <header className="page-header">
         <h1>DB Explorer</h1>
         <p className="page-subtitle">Kết nối MySQL, xem databases, tables, columns</p>
-        <p className="page-hint">
-          API: <kbd>connect-database.runasp.net</kbd>
-        </p>
       </header>
 
       <div className="dbe-container">
+        {/* API URL */}
+        <div className="dbe-card">
+          <div className="dbe-connect-row">
+            <div className="dbe-field">
+              <label>API Server</label>
+              <select
+                className="dbe-select"
+                value={API_OPTIONS.find((o) => o.url === apiUrl) ? apiUrl : 'custom'}
+                onChange={(e) => handleApiChange(e.target.value)}
+                disabled={connected}
+              >
+                {API_OPTIONS.map((o) => (
+                  <option key={o.url} value={o.url}>{o.label}</option>
+                ))}
+                <option value="custom">Custom...</option>
+              </select>
+            </div>
+            {!API_OPTIONS.find((o) => o.url === apiUrl) && (
+              <div className="dbe-field dbe-field-grow">
+                <label>Custom API URL</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    type="text"
+                    className="dbe-input"
+                    style={{ flex: 1 }}
+                    value={customApi}
+                    onChange={(e) => setCustomApi(e.target.value)}
+                    placeholder="https://your-api.com/api/db"
+                    disabled={connected}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleCustomApiApply(); }}
+                  />
+                  <button className="dbe-btn dbe-btn-connect" onClick={handleCustomApiApply} disabled={connected}>
+                    Apply
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="dbe-api-status">
+              <kbd>{apiUrl}</kbd>
+            </div>
+          </div>
+        </div>
+
         {/* Connection */}
         <div className="dbe-card">
           <div className="dbe-connect-row">

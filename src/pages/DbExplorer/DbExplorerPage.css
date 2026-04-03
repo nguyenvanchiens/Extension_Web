@@ -11,11 +11,32 @@
   margin-bottom: 16px;
 }
 
+.dbe-api-status {
+  display: flex;
+  align-items: flex-end;
+}
+
+.dbe-api-status kbd {
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: 'Consolas', monospace;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #4f46e5;
+  white-space: nowrap;
+  height: 38px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
 /* Connection row */
 .dbe-connect-row {
   display: flex;
   gap: 10px;
   align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .dbe-field {
