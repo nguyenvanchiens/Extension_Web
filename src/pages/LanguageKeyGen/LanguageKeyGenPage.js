@@ -8,6 +8,8 @@ const MODES = [
   { id: 'key', label: 'Từ Key (auto dịch)', icon: '🌐' },
 ];
 
+const DEFAULT_MODULES = ['Office', 'Supermarket'];
+
 function LanguageKeyGenPage() {
   const [mode, setMode] = useState('code');
   const [input, setInput] = useState('');
@@ -15,6 +17,8 @@ function LanguageKeyGenPage() {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(false);
+  const [modules, setModules] = useState(DEFAULT_MODULES);
+  const [customModule, setCustomModule] = useState('');
 
   const showToast = (message) => {
     setToast(message);
@@ -46,6 +50,7 @@ function LanguageKeyGenPage() {
           key: keyMatch[1],
           vietnamese: vietnameseComment,
           english: englishComment,
+          module: modules[0] || '',
         });
         vietnameseComment = '';
         englishComment = '';
@@ -92,6 +97,7 @@ function LanguageKeyGenPage() {
         key: item.key,
         english: item.english,
         vietnamese: vietnameseTexts[i] || item.english,
+        module: modules[0] || '',
       }));
 
       setResults(parsed);
@@ -100,6 +106,7 @@ function LanguageKeyGenPage() {
       setResults(items.map((item) => ({
         ...item,
         vietnamese: item.english,
+        module: modules[0] || '',
       })));
     }
     setLoading(false);
@@ -117,8 +124,16 @@ function LanguageKeyGenPage() {
     setResults(results.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
+  const addCustomModule = () => {
+    const val = customModule.trim();
+    if (val && !modules.includes(val)) {
+      setModules([...modules, val]);
+    }
+    setCustomModule('');
+  };
+
   const copyRow = (item, index) => {
-    const text = `${item.key}\t${item.vietnamese}\t${item.english}`;
+    const text = `${item.key}\t${item.vietnamese}\t${item.english}\t${item.module}`;
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 500);
@@ -128,7 +143,7 @@ function LanguageKeyGenPage() {
   const copyAll = () => {
     if (results.length === 0) return;
     const text = results
-      .map((item) => `${item.key}\t${item.vietnamese}\t${item.english}`)
+      .map((item) => `${item.key}\t${item.vietnamese}\t${item.english}\t${item.module}`)
       .join('\n');
     navigator.clipboard.writeText(text);
     showToast('Đã copy tất cả!');
@@ -203,6 +218,32 @@ function LanguageKeyGenPage() {
         </div>
 
         {results.length > 0 && (
+          <div className="lkg-module-bar">
+            <span className="lkg-module-label">Áp dụng module cho tất cả:</span>
+            {modules.map((m) => (
+              <button
+                key={m}
+                className="lkg-module-btn"
+                onClick={() => setResults(results.map((r) => ({ ...r, module: m })))}
+              >
+                {m}
+              </button>
+            ))}
+            <div className="lkg-module-add">
+              <input
+                type="text"
+                className="lkg-edit-input lkg-edit-input-small"
+                value={customModule}
+                onChange={(e) => setCustomModule(e.target.value)}
+                placeholder="Thêm module..."
+                onKeyDown={(e) => { if (e.key === 'Enter') addCustomModule(); }}
+              />
+              <button className="lkg-module-btn lkg-module-btn-add" onClick={addCustomModule} disabled={!customModule.trim()}>+</button>
+            </div>
+          </div>
+        )}
+
+        {results.length > 0 && (
           <div className="lkg-table-wrapper">
             <table className="lkg-table">
               <thead>
@@ -211,6 +252,7 @@ function LanguageKeyGenPage() {
                   <th>Key</th>
                   <th>Tiếng Việt</th>
                   <th>English</th>
+                  <th>Module</th>
                   <th className="lkg-th-copy"></th>
                 </tr>
               </thead>
@@ -237,6 +279,30 @@ function LanguageKeyGenPage() {
                         value={item.english}
                         onChange={(e) => updateResult(i, 'english', e.target.value)}
                       />
+                    </td>
+                    <td>
+                      <select
+                        className="lkg-edit-select"
+                        value={modules.includes(item.module) ? item.module : '__custom__'}
+                        onChange={(e) => {
+                          if (e.target.value === '__custom__') return;
+                          updateResult(i, 'module', e.target.value);
+                        }}
+                      >
+                        {modules.map((m) => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                        <option value="__custom__">Khác...</option>
+                      </select>
+                      {!modules.includes(item.module) && (
+                        <input
+                          type="text"
+                          className="lkg-edit-input lkg-edit-input-small"
+                          value={item.module}
+                          onChange={(e) => updateResult(i, 'module', e.target.value)}
+                          placeholder="Nhập module"
+                        />
+                      )}
                     </td>
                     <td className="lkg-td-copy">
                       <button className="lkg-btn-row-copy" onClick={() => copyRow(item, i)} title="Copy dòng này">
