@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import CodePreview from '../../components/CodePreview/CodePreview';
+import { genV4All } from '../../utils/generators/v4/genV4All';
+import { tableToModuleName } from '../../utils/generators/v4/genV4Helpers';
 import './DbExplorerPage.css';
 
 const API_OPTIONS = [
@@ -20,6 +23,11 @@ function DbExplorerPage() {
   const [toast, setToast] = useState('');
   const [searchDb, setSearchDb] = useState('');
   const [searchTable, setSearchTable] = useState('');
+  const [showGenV4, setShowGenV4] = useState(false);
+  const [genV4Result, setGenV4Result] = useState(null);
+  const [v4ModuleName, setV4ModuleName] = useState('');
+  const [v4Namespace, setV4Namespace] = useState('Fastlink.Portal');
+  const [v4ActiveFile, setV4ActiveFile] = useState(null);
 
   const handleApiChange = (value) => {
     if (value === 'custom') return;
@@ -107,6 +115,10 @@ function DbExplorerPage() {
 
   const handleSelectTable = async (table) => {
     setSelectedTable(table);
+    setShowGenV4(false);
+    setGenV4Result(null);
+    setV4ActiveFile(null);
+    setV4ModuleName('');
     if (!table) {
       setColumns([]);
       return;
@@ -137,6 +149,38 @@ function DbExplorerPage() {
     setError('');
     setSearchTable('');
   };
+
+  const handleGenV4 = () => {
+    const name = v4ModuleName || tableToModuleName(selectedTable);
+    setV4ModuleName(name);
+    const result = genV4All(selectedTable, columns, { moduleName: name, namespace: v4Namespace });
+    setGenV4Result(result);
+    setShowGenV4(true);
+    setV4ActiveFile(null);
+  };
+
+  // Build flat file list from gen result for tree view
+  const getV4FileTree = () => {
+    if (!genV4Result) return [];
+    const files = [];
+    const add = (folder, item) => files.push({ folder, fileName: item.fileName, code: item.code });
+    add('Entities', genV4Result.entity);
+    add('Repos', genV4Result.repository);
+    add('Services', genV4Result.service);
+    add(`Models/${v4ModuleName}`, genV4Result.constFile);
+    genV4Result.models.forEach((m) => add(`Models/${v4ModuleName}`, m));
+    genV4Result.endpoints.forEach((e) => add(`Endpoints/${v4ModuleName}`, e));
+    genV4Result.validators.forEach((v) => add('Validators', v));
+    return files;
+  };
+
+  const v4Files = getV4FileTree();
+  // Group by folder
+  const v4Folders = {};
+  v4Files.forEach((f) => {
+    if (!v4Folders[f.folder]) v4Folders[f.folder] = [];
+    v4Folders[f.folder].push(f);
+  });
 
   const copyColumns = () => {
     if (columns.length === 0) return;
@@ -332,6 +376,7 @@ function DbExplorerPage() {
                 <button className="dbe-copy-btn" onClick={copyColumns} title="Copy dạng tab-separated">📋 Copy</button>
                 <button className="dbe-copy-btn" onClick={copyCSharpClass} title="Copy C# class">C# Class</button>
                 <button className="dbe-copy-btn" onClick={copyTsInterface} title="Copy TypeScript interface">TS Interface</button>
+                <button className="dbe-copy-btn dbe-btn-gen-v4" onClick={handleGenV4} title="Gen Code V4 (Entity, Repo, Service, Endpoints, Models, Validators)">⚡ Gen V4</button>
               </div>
             </div>
 
@@ -377,6 +422,56 @@ function DbExplorerPage() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Gen V4 Result */}
+        {showGenV4 && genV4Result && (
+          <div className="dbe-card">
+            <div className="dbe-gen-toolbar">
+              <div className="dbe-columns-title">
+                <strong>Gen Code V4</strong>
+                <span className="dbe-label-badge">{v4ModuleName}</span>
+              </div>
+              <div className="dbe-gen-config">
+                <label>Module:</label>
+                <input type="text" className="dbe-input dbe-input-small" value={v4ModuleName} onChange={(e) => setV4ModuleName(e.target.value)} />
+                <label>Namespace:</label>
+                <input type="text" className="dbe-input dbe-input-small" value={v4Namespace} onChange={(e) => setV4Namespace(e.target.value)} />
+                <button className="dbe-copy-btn dbe-btn-gen-v4" onClick={handleGenV4}>Re-gen</button>
+                <button className="dbe-copy-btn" onClick={() => setShowGenV4(false)}>Đóng</button>
+              </div>
+            </div>
+
+            <div className="v4-layout">
+              {/* Tree */}
+              <div className="v4-tree">
+                {Object.entries(v4Folders).map(([folder, files]) => (
+                  <div key={folder} className="v4-folder">
+                    <div className="v4-folder-name">📁 {folder}</div>
+                    {files.map((f) => (
+                      <button
+                        key={f.fileName}
+                        className={`v4-file ${v4ActiveFile && v4ActiveFile.fileName === f.fileName && v4ActiveFile.folder === f.folder ? 'active' : ''}`}
+                        onClick={() => setV4ActiveFile(f)}
+                      >
+                        <span className="v4-file-icon">📄</span>
+                        {f.fileName}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              {/* Code preview */}
+              <div className="v4-preview">
+                {v4ActiveFile ? (
+                  <CodePreview code={v4ActiveFile.code} fileName={`${v4ActiveFile.folder}/${v4ActiveFile.fileName}`} />
+                ) : (
+                  <div className="v4-empty">Chọn file bên trái để xem code</div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

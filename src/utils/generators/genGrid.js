@@ -132,12 +132,18 @@ export function genGrid(moduleName, config) {
     lines.push(col);
   });
 
-  lines.push(`                })`);
-  lines.push(`                .buttons(button => {`);
-  if (allowUpdate) lines.push(`                    button.addEdit();`);
-  if (allowDelete) lines.push(`                    button.addDelete();`);
-  if (allowInsert) lines.push(`                    button.addSave();`);
-  lines.push(`                    button.addCancel();`);
+  // Action buttons column
+  const hasActions = allowUpdate || allowDelete || allowInsert;
+  if (hasActions) {
+    lines.push(`                    columns.add().minWidth(85).allowExporting(false).fixedPosition('right')`);
+    lines.push(`                        .buttons(button => {`);
+    if (allowUpdate) lines.push(`                            button.addEdit().isButton();`);
+    if (allowDelete) lines.push(`                            button.addDelete().isButton();`);
+    if (allowInsert) lines.push(`                            button.addSave().isButton();`);
+    lines.push(`                            button.addCancel().isButton();`);
+    lines.push(`                        });`);
+  }
+
   lines.push(`                })`);
   lines.push(`                .dataSource(ds => {`);
 
