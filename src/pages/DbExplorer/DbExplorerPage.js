@@ -23,6 +23,10 @@ function DbExplorerPage() {
   const [toast, setToast] = useState('');
   const [searchDb, setSearchDb] = useState('');
   const [searchTable, setSearchTable] = useState('');
+  const [showColumns, setShowColumns] = useState(true);
+  const [dbMode, setDbMode] = useState('connect'); // 'connect' | 'paste'
+  const [pasteInput, setPasteInput] = useState('');
+  const [pasteTableName, setPasteTableName] = useState('');
   const [showGenV4, setShowGenV4] = useState(false);
   const [genV4Result, setGenV4Result] = useState(null);
   const [v4ModuleName, setV4ModuleName] = useState('');
@@ -167,10 +171,11 @@ function DbExplorerPage() {
     add('Entities', genV4Result.entity);
     add('Repos', genV4Result.repository);
     add('Services', genV4Result.service);
+    add('Services', genV4Result.mappingProfile);
     add(`Models/${v4ModuleName}`, genV4Result.constFile);
     genV4Result.models.forEach((m) => add(`Models/${v4ModuleName}`, m));
     genV4Result.endpoints.forEach((e) => add(`Endpoints/${v4ModuleName}`, e));
-    genV4Result.validators.forEach((v) => add('Validators', v));
+    add('ApiClient', genV4Result.apiClient);
     return files;
   };
 
@@ -181,6 +186,36 @@ function DbExplorerPage() {
     if (!v4Folders[f.folder]) v4Folders[f.folder] = [];
     v4Folders[f.folder].push(f);
   });
+
+  const parseNavicatStructure = () => {
+    if (!pasteInput.trim() || !pasteTableName.trim()) return;
+    const lines = pasteInput.trim().split('\n');
+    const parsed = [];
+    for (const line of lines) {
+      const parts = line.split('\t');
+      if (parts.length < 3) continue;
+      const name = parts[0].trim();
+      const type = parts[1].trim();
+      const length = parseInt(parts[2]) || 0;
+      const decimals = parseInt(parts[3]) || 0;
+      // cột index 4: not null flag (-1 = nullable, 0 = not null)
+      const nullFlag = parseInt(parts[4]);
+      const nullable = nullFlag === -1 || nullFlag === 1;
+      // cột index 5: key (0 = none, -1 = PRI)
+      const keyFlag = parseInt(parts[5]);
+      const key = keyFlag === -1 ? 'PRI' : '';
+      parsed.push({ name, type, length, decimals, nullable, key, default: null, extra: '', comment: '' });
+    }
+    if (parsed.length > 0) {
+      setColumns(parsed);
+      setSelectedTable(pasteTableName.trim());
+      setShowColumns(true);
+      setShowGenV4(false);
+      setGenV4Result(null);
+      setV4ActiveFile(null);
+      setV4ModuleName('');
+    }
+  };
 
   const copyColumns = () => {
     if (columns.length === 0) return;
@@ -231,7 +266,46 @@ function DbExplorerPage() {
       </header>
 
       <div className="dbe-container">
-        {/* API URL */}
+        {/* Mode switch */}
+        <div className="dbe-mode-switch">
+          <button className={`dbe-mode-btn ${dbMode === 'connect' ? 'active' : ''}`} onClick={() => setDbMode('connect')}>
+            🔌 Kết nối DB
+          </button>
+          <button className={`dbe-mode-btn ${dbMode === 'paste' ? 'active' : ''}`} onClick={() => setDbMode('paste')}>
+            📋 Paste Structure
+          </button>
+        </div>
+
+        {/* Paste mode */}
+        {dbMode === 'paste' && (
+          <div className="dbe-card">
+            <div className="dbe-connect-row">
+              <div className="dbe-field">
+                <label>Table Name</label>
+                <input
+                  type="text"
+                  className="dbe-input"
+                  value={pasteTableName}
+                  onChange={(e) => setPasteTableName(e.target.value)}
+                  placeholder="VD: op_au_super_market_check_in"
+                />
+              </div>
+              <button className="dbe-btn dbe-btn-connect" onClick={parseNavicatStructure} disabled={!pasteInput.trim() || !pasteTableName.trim()}>
+                Parse
+              </button>
+            </div>
+            <textarea
+              className="dbe-paste-textarea"
+              value={pasteInput}
+              onChange={(e) => setPasteInput(e.target.value)}
+              placeholder="Paste cấu trúc từ Navicat vào đây (select all columns rồi copy)"
+              rows={8}
+            />
+          </div>
+        )}
+
+        {/* Connect mode */}
+        {dbMode === 'connect' && (<>
         <div className="dbe-card">
           <div className="dbe-connect-row">
             <div className="dbe-field">
@@ -363,16 +437,18 @@ function DbExplorerPage() {
             </div>
           )}
         </div>
+        </>)}
 
         {/* Columns */}
         {columns.length > 0 && (
           <div className="dbe-card">
-            <div className="dbe-columns-header">
+            <div className="dbe-columns-header" onClick={() => setShowColumns(!showColumns)} style={{ cursor: 'pointer' }}>
               <div className="dbe-columns-title">
+                <span className="dbe-toggle-arrow">{showColumns ? '▾' : '▸'}</span>
                 <strong>{selectedTable}</strong>
                 <span className="dbe-label-badge">{columns.length} columns</span>
               </div>
-              <div className="dbe-columns-actions">
+              <div className="dbe-columns-actions" onClick={(e) => e.stopPropagation()}>
                 <button className="dbe-copy-btn" onClick={copyColumns} title="Copy dạng tab-separated">📋 Copy</button>
                 <button className="dbe-copy-btn" onClick={copyCSharpClass} title="Copy C# class">C# Class</button>
                 <button className="dbe-copy-btn" onClick={copyTsInterface} title="Copy TypeScript interface">TS Interface</button>
@@ -382,7 +458,7 @@ function DbExplorerPage() {
 
             {loading === 'columns' ? (
               <div className="dbe-empty">Loading columns...</div>
-            ) : (
+            ) : showColumns && (
               <div className="dbe-table-wrapper">
                 <table className="dbe-table">
                   <thead>

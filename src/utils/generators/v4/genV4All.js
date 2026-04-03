@@ -14,10 +14,11 @@ export function genV4All(tableName, columns, options = {}) {
     entity: genEntity(moduleName, tableName, columns, customFields, hasUpdated, hasDeleted, namespace),
     repository: genRepository(moduleName, namespace),
     service: genService(moduleName, customFields, namespace),
+    mappingProfile: genMappingProfile(moduleName, namespace),
     constFile: genConst(moduleName, routeBase, groupKey, namespace),
     models: genModels(moduleName, customFields, namespace),
-    endpoints: genEndpoints(moduleName, namespace),
-    validators: genValidators(moduleName, customFields, namespace),
+    endpoints: genEndpoints(moduleName, customFields, namespace),
+    apiClient: genApiClient(moduleName, namespace),
   };
 }
 
@@ -315,7 +316,14 @@ public class ${moduleName}DeleteRequest
   ];
 }
 
-function genEndpoints(moduleName, ns) {
+function genEndpoints(moduleName, customFields, ns) {
+  const requiredFields = customFields.filter((c) => !c.nullable && c.type !== 'bit' && c.type !== 'tinyint');
+
+  const validatorRules = requiredFields.map((f) => {
+    const propName = toPascalCase(f.name);
+    return `            RuleFor(x => x.${propName})\n                .NotEmpty()\n                .WithMessage("${propName} is required");`;
+  }).join('\n\n');
+
   const ep = (name, reqType, resType, summary, hasUser, noJwt) => {
     const jwt = noJwt ? `\n        public override bool RequiredJwt => false;` : '';
     const userLine = hasUser ? `\n            var createdUser = this.GetUserName();` : '';
@@ -360,11 +368,27 @@ public class ${name}Endpoint : BasePostEndpoint<${reqType}, ${resType}>
 }`;
   };
 
-  // Fix const name mapping
-  const getListEp = ep(`GetList${moduleName}s`, `${moduleName}GetListRequest`, `BusinessResult<List<${moduleName}Model>>`, `Get list ${moduleName}s`, false, true)
+  const idOnlyRules = `            RuleFor(x => x.Id)\n                .NotEmpty()\n                .WithMessage("Id is required");`;
+
+  const genValidator = (reqType, rules) => `using FastEndpoints;
+using ${ns}.Shared.Models;
+using FluentValidation;
+
+namespace ${ns}.Endpoints;
+
+public class ${reqType}Validator : Validator<${reqType}>
+{
+    public ${reqType}Validator()
+    {
+${rules}
+    }
+}`;
+
+  // Generate endpoints
+  const getListEp = ep(`GetList${moduleName}s`, `${moduleName}GetListRequest`, `BusinessResult<List<${moduleName}Model>>`, `Get list ${moduleName}s`, false, false)
     .replace(`${moduleName}Const.GetList`, `${moduleName}Const.GetList${moduleName}s`);
 
-  const getByIdEp = ep(`Get${moduleName}ById`, `${moduleName}GetByIdRequest`, `BusinessResult<${moduleName}Model>`, `Get ${moduleName} by id`, false, true)
+  const getByIdEp = ep(`Get${moduleName}ById`, `${moduleName}GetByIdRequest`, `BusinessResult<${moduleName}Model>`, `Get ${moduleName} by id`, false, false)
     .replace(`${moduleName}Const.GetById`, `${moduleName}Const.Get${moduleName}ById`);
 
   const createEp = ep(`Create${moduleName}`, `${moduleName}CreateRequest`, `BusinessResult`, `Create ${moduleName}`, true, false)
@@ -376,10 +400,12 @@ public class ${name}Endpoint : BasePostEndpoint<${reqType}, ${resType}>
   const deleteEp = ep(`Delete${moduleName}`, `${moduleName}DeleteRequest`, `BusinessResult`, `Delete ${moduleName}`, true, false)
     .replace(`${moduleName}Const.Delete`, `${moduleName}Const.Delete${moduleName}`);
 
-  // Fix service call for getList (no req param)
-  const fixedGetListEp = getListEp.replace(`_service.GetList${moduleName}sAsync()`, `_service.GetList${moduleName}sAsync()`);
+  // Validators - tách file riêng
+  const getByIdValidator = genValidator(`${moduleName}GetByIdRequest`, idOnlyRules);
+  const createValidator = genValidator(`${moduleName}CreateRequest`, validatorRules || '            // TODO: add validation rules');
+  const updateValidator = genValidator(`${moduleName}UpdateRequest`, [idOnlyRules, validatorRules].filter(Boolean).join('\n\n'));
+  const deleteValidator = genValidator(`${moduleName}DeleteRequest`, idOnlyRules);
 
-  // Add GetListRequest model
   const getListRequest = `namespace ${ns}.Shared.Models;
 
 public class ${moduleName}GetListRequest
@@ -387,57 +413,60 @@ public class ${moduleName}GetListRequest
 }`;
 
   return [
-    { fileName: `GetList${moduleName}sEndpoint.cs`, code: fixedGetListEp },
+    { fileName: `GetList${moduleName}sEndpoint.cs`, code: getListEp },
     { fileName: `Get${moduleName}ByIdEndpoint.cs`, code: getByIdEp },
+    { fileName: `Get${moduleName}ByIdRequestValidator.cs`, code: getByIdValidator },
     { fileName: `Create${moduleName}Endpoint.cs`, code: createEp },
+    { fileName: `Create${moduleName}RequestValidator.cs`, code: createValidator },
     { fileName: `Update${moduleName}Endpoint.cs`, code: updateEp },
+    { fileName: `Update${moduleName}RequestValidator.cs`, code: updateValidator },
     { fileName: `Delete${moduleName}Endpoint.cs`, code: deleteEp },
+    { fileName: `Delete${moduleName}RequestValidator.cs`, code: deleteValidator },
     { fileName: `${moduleName}GetListRequest.cs`, code: getListRequest },
   ];
 }
 
-function genValidators(moduleName, customFields, ns) {
-  const requiredFields = customFields.filter((c) => !c.nullable && c.type !== 'bit' && c.type !== 'tinyint');
+function genMappingProfile(moduleName, ns) {
+  const code = `// Thêm vào PortalMappingProfile.cs trong constructor
 
-  const rules = requiredFields.map((f) => {
-    const propName = toPascalCase(f.name);
-    return `            RuleFor(x => x.${propName})\n                .NotEmpty()\n                .WithMessage("${propName} is required");`;
-  }).join('\n\n');
+// ${moduleName}
+CreateMap<${moduleName}Entity, ${moduleName}Model>().ReverseMap();
+CreateMap<${moduleName}Entity, ${moduleName}CreateRequest>().ReverseMap();
+CreateMap<${moduleName}Entity, ${moduleName}UpdateRequest>().ReverseMap();`;
+  return { fileName: `${moduleName}MappingProfile.cs`, code };
+}
 
-  const createValidator = `using FastEndpoints;
-using ${ns}.Shared.Models;
-using FluentValidation;
+function genApiClient(moduleName, ns) {
+  const code = `using ${ns}.Shared.Models;
+using ${ns}.Shared.Models.${moduleName};
+using Framework.Common;
 
-namespace ${ns}.Endpoints;
+namespace ${ns}.ApiClient;
 
-public class ${moduleName}CreateRequestValidator : Validator<${moduleName}CreateRequest>
+public class ${moduleName}ApiClient : BasePortalApiClient
 {
-    public ${moduleName}CreateRequestValidator()
+    public ${moduleName}ApiClient(IHttpClientFactory httpClientFactory, IServiceProvider serviceProvider, IOpenIdConnectTokenProvider tokenProvider)
+        : base(httpClientFactory, serviceProvider, tokenProvider)
     {
-${rules}
     }
-}`;
 
-  const updateValidator = `using FastEndpoints;
-using ${ns}.Shared.Models;
-using FluentValidation;
+    public Task<BusinessResult<List<${moduleName}Model>>> GetList${moduleName}s(${moduleName}GetListRequest request)
+        => PostAsync<List<${moduleName}Model>>(${moduleName}Const.GetList${moduleName}s, request);
 
-namespace ${ns}.Endpoints;
+    public Task<BusinessResult<${moduleName}Model>> Get${moduleName}ById(${moduleName}GetByIdRequest request)
+        => PostAsync<${moduleName}Model>(${moduleName}Const.Get${moduleName}ById, request);
 
-public class ${moduleName}UpdateRequestValidator : Validator<${moduleName}UpdateRequest>
-{
-    public ${moduleName}UpdateRequestValidator()
-    {
-            RuleFor(x => x.Id)
-                .NotEmpty()
-                .WithMessage("Id is required");
+    public Task<BusinessResult> Create${moduleName}(${moduleName}CreateRequest request)
+        => PostAsync(${moduleName}Const.Create${moduleName}, request);
 
-${rules}
-    }
-}`;
+    public Task<BusinessResult> Update${moduleName}(${moduleName}UpdateRequest request)
+        => PostAsync(${moduleName}Const.Update${moduleName}, request);
 
-  return [
-    { fileName: `${moduleName}CreateRequestValidator.cs`, code: createValidator },
-    { fileName: `${moduleName}UpdateRequestValidator.cs`, code: updateValidator },
-  ];
+    public Task<BusinessResult> Delete${moduleName}(${moduleName}DeleteRequest request)
+        => PostAsync(${moduleName}Const.Delete${moduleName}, request);
+}
+
+// Thêm vào PortalApiClientExtensions.cs:
+// services.AddScoped<${moduleName}ApiClient>();`;
+  return { fileName: `${moduleName}ApiClient.cs`, code };
 }
