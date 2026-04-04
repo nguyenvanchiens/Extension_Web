@@ -11,7 +11,6 @@ function ArcadePage() {
   const [unlocked, setUnlocked] = useState(false);
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
-  const [activeGame, setActiveGame] = useState(null);
 
   const handleUnlock = () => {
     if (code === PASSCODE) {
@@ -48,23 +47,9 @@ function ArcadePage() {
     );
   }
 
-  if (activeGame) {
-    return (
-      <div className="arcade-game-view">
-        <div className="arcade-game-header">
-          <button className="arcade-back-btn" onClick={() => setActiveGame(null)}>
-            ← Quay lại
-          </button>
-          <span className="arcade-game-title">{activeGame.icon} {activeGame.name}</span>
-        </div>
-        <iframe
-          className="arcade-iframe"
-          src={activeGame.src}
-          title={activeGame.name}
-        />
-      </div>
-    );
-  }
+  const openGame = (game) => {
+    window.open(game.src, '_blank');
+  };
 
   return (
     <>
@@ -78,7 +63,7 @@ function ArcadePage() {
           <button
             key={game.id}
             className="arcade-card"
-            onClick={() => setActiveGame(game)}
+            onClick={() => openGame(game)}
           >
             <div className="arcade-card-icon">{game.icon}</div>
             <div className="arcade-card-info">
