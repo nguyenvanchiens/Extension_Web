@@ -792,17 +792,24 @@ function toggleLog() {
 // ============================================================
 //  NETWORKING (PeerJS WebRTC)
 const peerConfig = {
+  host: '0.peerjs.com',
+  secure: true,
+  port: 443,
+  debug: 1,
   config: {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
-      { urls: 'stun:stun2.l.google.com:19302' },
-      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'stun:global.stun.twilio.com:3478' },
+      { urls: 'turn:global.turn.twilio.com:3478?transport=udp', username: 'f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d', credential: 'w1uxM55V9yVoqyVFjt+meu7cPP7GExJLkQDeLuKSPMg=' },
+      { urls: 'turn:global.turn.twilio.com:3478?transport=tcp', username: 'f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d', credential: 'w1uxM55V9yVoqyVFjt+meu7cPP7GExJLkQDeLuKSPMg=' },
+      { urls: 'turn:global.turn.twilio.com:443?transport=tcp', username: 'f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d', credential: 'w1uxM55V9yVoqyVFjt+meu7cPP7GExJLkQDeLuKSPMg=' },
     ]
   }
 };
+
+// Retry connection with timeout
+const CONNECT_TIMEOUT = 10000;
 // ============================================================
 let peer = null;
 let conn = null;
@@ -857,6 +864,7 @@ function showCreate() {
   setMsg('create-status','Dang tao phong...');
 
   const roomCode = generateRoomCode();
+  if (peer) { try { peer.destroy(); } catch(e) {} }
   peer = new Peer('chess-' + roomCode.toLowerCase(), peerConfig);
 
   const port = location.port || (location.protocol === 'https:' ? '443' : '80');
@@ -878,7 +886,20 @@ function showCreate() {
     });
   });
 
-  peer.on('error', (err) => { setMsg('create-status','Loi: '+err.type,'error'); });
+  peer.on('error', (err) => {
+    console.error('PeerJS create error:', err);
+    if (err.type === 'unavailable-id') {
+      setMsg('create-status','Ma phong da ton tai, thu lai...','error');
+    } else if (err.type === 'network' || err.type === 'server-error') {
+      setMsg('create-status','Loi mang, dang thu lai...','error');
+    } else {
+      setMsg('create-status','Loi: '+err.type,'error');
+    }
+  });
+  peer.on('disconnected', () => {
+    setMsg('create-status','Mat ket noi server, dang thu lai...','error');
+    setTimeout(() => { if (peer && !peer.destroyed) peer.reconnect(); }, 2000);
+  });
 }
 
 function showJoin() {
@@ -892,19 +913,39 @@ function joinRoom() {
   if (!code || code.length < 4) { setMsg('join-status','Nhap ma phong!','error'); return; }
   setMsg('join-status','Dang ket noi...');
 
+  if (peer) { try { peer.destroy(); } catch(e) {} }
   peer = new Peer('chess-join-' + Math.random().toString(36).substring(2,8), peerConfig);
+
+  let connectTimer = null;
   peer.on('open', () => {
-    conn = peer.connect('chess-' + code.toLowerCase(), { reliable: true });
+    conn = peer.connect('chess-' + code.toLowerCase(), { reliable: true, serialization: 'json' });
     isHost = false;
     mySide = 'black';
+
+    connectTimer = setTimeout(() => {
+      setMsg('join-status','Ket noi qua lau, thu lai...','error');
+    }, CONNECT_TIMEOUT);
+
     conn.on('open', () => {
+      clearTimeout(connectTimer);
       setupConnection();
       setMsg('join-status','Da ket noi!','success');
       setTimeout(() => startOnlineGame(), 400);
     });
     conn.on('error', () => { setMsg('join-status','Khong the ket noi!','error'); });
   });
-  peer.on('error', () => { setMsg('join-status','Khong tim thay phong!','error'); });
+  peer.on('error', (err) => {
+    console.error('PeerJS join error:', err);
+    if (err.type === 'peer-unavailable') {
+      setMsg('join-status','Khong tim thay phong! Kiem tra lai ma phong.','error');
+    } else {
+      setMsg('join-status','Loi ket noi: '+err.type,'error');
+    }
+  });
+  peer.on('disconnected', () => {
+    setMsg('join-status','Mat ket noi, dang thu lai...','error');
+    setTimeout(() => { if (peer && !peer.destroyed) peer.reconnect(); }, 2000);
+  });
 }
 
 function setupConnection() {
