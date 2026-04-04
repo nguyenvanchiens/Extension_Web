@@ -697,9 +697,9 @@
       <p style="color:#888; font-size:13px; margin-bottom:6px;">Ma phong:</p>
       <div class="room-code-display" id="room-code" onclick="copyRoomCode()">...</div>
       <p style="color:#555; font-size:11px;">Nhan de copy</p>
-      <div class="lan-info">
-        Ban be truy cap: <br>
-        <span id="lan-link" onclick="copyLanLink()"></span>
+      <div class="lan-info" onclick="copyLanLink()" style="cursor:pointer;">
+        📋 Nhấn để copy link mời bạn bè
+        <span id="lan-link" style="display:none;"></span>
       </div>
       <div class="status-msg" id="create-status">Dang tao phong...</div>
       <div class="back-link" onclick="backToMenu()">&#8592; Quay lai</div>
