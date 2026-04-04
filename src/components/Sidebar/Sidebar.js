@@ -60,7 +60,13 @@ function Sidebar({ activeTool, onToolChange, collapsed, onToggle }) {
       </nav>
 
       <div className="sidebar-footer">
-        {!collapsed && <span className="sidebar-version">v1.0.0</span>}
+        <span
+          className="sidebar-version"
+          onDoubleClick={() => onToolChange('arcade')}
+          title=""
+        >
+          {!collapsed ? 'v1.0.0' : '·'}
+        </span>
       </div>
     </aside>
   );

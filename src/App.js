@@ -7,6 +7,7 @@ import DbExplorerPage from './pages/DbExplorer/DbExplorerPage';
 import JsonFormatterPage from './pages/JsonFormatter/JsonFormatterPage';
 import HelperPage from './pages/Helper/HelperPage';
 import SendMailPage from './pages/SendMail/SendMailPage';
+import ArcadePage from './pages/Arcade/ArcadePage';
 import './App.css';
 
 function App() {
@@ -29,6 +30,8 @@ function App() {
         return <HelperPage />;
       case 'send-mail':
         return <SendMailPage />;
+      case 'arcade':
+        return <ArcadePage />;
       default:
         return <NotificationPage />;
     }
