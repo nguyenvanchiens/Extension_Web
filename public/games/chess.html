@@ -791,6 +791,18 @@ function toggleLog() {
 
 // ============================================================
 //  NETWORKING (PeerJS WebRTC)
+const peerConfig = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+    ]
+  }
+};
 // ============================================================
 let peer = null;
 let conn = null;
@@ -845,7 +857,7 @@ function showCreate() {
   setMsg('create-status','Dang tao phong...');
 
   const roomCode = generateRoomCode();
-  peer = new Peer('chess-' + roomCode.toLowerCase());
+  peer = new Peer('chess-' + roomCode.toLowerCase(), peerConfig);
 
   const port = location.port || (location.protocol === 'https:' ? '443' : '80');
   document.getElementById('lan-link').textContent = location.protocol + '//' + location.host + location.pathname;
@@ -880,7 +892,7 @@ function joinRoom() {
   if (!code || code.length < 4) { setMsg('join-status','Nhap ma phong!','error'); return; }
   setMsg('join-status','Dang ket noi...');
 
-  peer = new Peer('chess-join-' + Math.random().toString(36).substring(2,8));
+  peer = new Peer('chess-join-' + Math.random().toString(36).substring(2,8), peerConfig);
   peer.on('open', () => {
     conn = peer.connect('chess-' + code.toLowerCase(), { reliable: true });
     isHost = false;
