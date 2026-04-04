@@ -848,7 +848,7 @@ function showCreate() {
   peer = new Peer('chess-' + roomCode.toLowerCase());
 
   const port = location.port || (location.protocol === 'https:' ? '443' : '80');
-  document.getElementById('lan-link').textContent = 'http://10.110.6.107:' + port + location.pathname;
+  document.getElementById('lan-link').textContent = location.protocol + '//' + location.host + location.pathname;
 
   peer.on('open', () => {
     document.getElementById('room-code').textContent = roomCode;
