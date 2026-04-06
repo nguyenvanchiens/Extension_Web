@@ -641,6 +641,26 @@
     .move-num { color: #444; width: 28px; text-align: right; }
     .move-white, .move-black { width: 60px; color: #aaa; }
 
+    .btn-draw { color: #eab308; border-color: #eab30844; }
+    .btn-draw:hover { background: #eab30822; color: #eab308; border-color: #eab308; }
+    .btn-resign { color: #ef4444; border-color: #ef444444; }
+    .btn-resign:hover { background: #ef444422; color: #ef4444; border-color: #ef4444; }
+
+    .confirm-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 150;
+      justify-content: center; align-items: center;
+    }
+    .confirm-overlay.active { display: flex; }
+    .confirm-box {
+      background: #272522; border-radius: 14px;
+      padding: 28px 32px; text-align: center;
+      border: 1px solid #3a3733; min-width: 300px;
+    }
+    .confirm-box p { font-size: 16px; font-weight: 600; color: #e0e0e0; margin-bottom: 18px; }
+    .confirm-actions { display: flex; gap: 10px; }
+    .confirm-actions .lobby-btn { flex: 1; margin: 0; padding: 12px; }
+
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.7); z-index: 100;
@@ -746,8 +766,21 @@
 
   <div class="bottom-bar">
     <button class="game-btn" onclick="undoMove()">&#8617; Hoan tac</button>
+    <button class="game-btn btn-draw" onclick="requestDraw()">&#9876; Cau hoa</button>
     <div class="status-text" id="status">Luot cua Trang</div>
+    <button class="game-btn btn-resign" onclick="requestResign()">&#9873; Xin thua</button>
     <button class="game-btn" onclick="requestNewGame()">Van moi</button>
+  </div>
+
+  <!-- Draw request overlay -->
+  <div class="confirm-overlay" id="draw-overlay">
+    <div class="confirm-box">
+      <p>Doi thu muon cau hoa.</p>
+      <div class="confirm-actions">
+        <button class="lobby-btn btn-create" onclick="acceptDraw()">Dong y</button>
+        <button class="lobby-btn btn-join" onclick="declineDraw()">Tu choi</button>
+      </div>
+    </div>
   </div>
 
   <div class="move-log-wrap">
@@ -951,8 +984,12 @@ function joinRoom() {
 function setupConnection() {
   conn.on('data', (data) => {
     if (data.type === 'move') receiveMove(data.fr, data.fc, data.tr, data.tc, data.promoteTo);
-    else if (data.type === 'newgame') newGame();
+    else if (data.type === 'newgame') handleRemoteNewGame();
     else if (data.type === 'undo') performUndo();
+    else if (data.type === 'draw-request') showDrawRequest();
+    else if (data.type === 'draw-accept') endGameDraw();
+    else if (data.type === 'draw-decline') showToast('Doi thu tu choi cau hoa');
+    else if (data.type === 'resign') endGameResign(mySide);
   });
   conn.on('close', () => {
     document.getElementById('connection-bar').classList.add('disconnected');
@@ -1256,7 +1293,79 @@ function performUndo(){
   moveLog.pop();rebuildMoveLog();render();updateCaptured();updateStatus();triggerHint();
 }
 function undoMove(){performUndo();if(gameMode==='online')sendData({type:'undo'});}
-function requestNewGame(){newGame();if(gameMode==='online')sendData({type:'newgame'});}
+function swapSides() {
+  if (gameMode !== 'online') return;
+  mySide = mySide === 'white' ? 'black' : 'white';
+  document.getElementById('badge-bottom').classList.toggle('show', mySide === 'white');
+  document.getElementById('badge-top').classList.toggle('show', mySide === 'black');
+}
+
+function requestNewGame() {
+  swapSides();
+  newGame();
+  if (gameMode === 'online') sendData({ type: 'newgame' });
+}
+
+function handleRemoteNewGame() {
+  swapSides();
+  newGame();
+}
+
+// ---- Draw ----
+function requestDraw() {
+  if (gameOver) return;
+  if (gameMode === 'online') {
+    sendData({ type: 'draw-request' });
+    showToast('Da gui yeu cau cau hoa');
+  } else {
+    endGameDraw();
+  }
+}
+
+function showDrawRequest() {
+  document.getElementById('draw-overlay').classList.add('active');
+}
+
+function acceptDraw() {
+  document.getElementById('draw-overlay').classList.remove('active');
+  sendData({ type: 'draw-accept' });
+  endGameDraw();
+}
+
+function declineDraw() {
+  document.getElementById('draw-overlay').classList.remove('active');
+  sendData({ type: 'draw-decline' });
+}
+
+function endGameDraw() {
+  gameOver = true;
+  const el = document.getElementById('status');
+  el.textContent = 'Hoa co! (Thoa thuan)';
+  el.className = 'status-text stalemate-status';
+}
+
+// ---- Resign ----
+function requestResign() {
+  if (gameOver) return;
+  if (!confirm('Ban chac chan muon xin thua?')) return;
+  if (gameMode === 'online') {
+    sendData({ type: 'resign' });
+    const winner = mySide === 'white' ? 'black' : 'white';
+    endGameResign(winner);
+  } else {
+    const loser = turn;
+    const winner = loser === 'white' ? 'black' : 'white';
+    endGameResign(winner);
+  }
+}
+
+function endGameResign(winner) {
+  gameOver = true;
+  const el = document.getElementById('status');
+  el.textContent = `${winner === 'white' ? 'Trang' : 'Den'} thang! (Doi thu dau hang)`;
+  el.className = 'status-text checkmate-status';
+  setTimeout(() => showVictoryEffect(winner), 300);
+}
 
 function rebuildMoveLog(){
   const el=document.getElementById('move-log');el.innerHTML='';
